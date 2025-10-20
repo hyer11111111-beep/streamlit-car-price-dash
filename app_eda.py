@@ -5,6 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sb
 import os
+import plotly.express as px
 
 def run_eda():
     st.subheader('탐색적 데이터 분석 (EDA)')
@@ -38,6 +39,10 @@ def run_eda():
     max_val = df[select_choice].max()
     st.info(f'{select_choice}는 {min_val} 부터 {max_val} 까지 있습니다.')
 
+    # 간단한 분포 차트 (Plotly)
+    fig_dist = px.histogram(df, x=select_choice, nbins=30, title=f'{select_choice} 분포')
+    st.plotly_chart(fig_dist, use_container_width=True)
+
     st.subheader('상관관계 분석')
     multi_menu = numeric_cols
     choice_multi_list = st.multiselect('컬럼을 2개 이상 선택하세요', multi_menu)
@@ -49,6 +54,11 @@ def run_eda():
         fig1, ax1 = plt.subplots(figsize=(6,4))
         sb.heatmap(data=corr, vmin=-1, vmax=1, cmap='coolwarm', annot=True, fmt='.2f', linewidths=0.8, ax=ax1)
         st.pyplot(fig1)
+
+        # Plotly scatter matrix as alternative
+        if len(choice_multi_list) <= 6:
+            fig_matrix = px.scatter_matrix(df[choice_multi_list].dropna(), dimensions=choice_multi_list, title='Scatter Matrix')
+            st.plotly_chart(fig_matrix, use_container_width=True)
 
     st.subheader('각 컬럼간의 Pair Plot')
     # pairplot은 큰 리소스일 수 있으므로 선택적으로 보여주기
